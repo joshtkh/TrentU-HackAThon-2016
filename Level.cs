@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +10,7 @@ namespace TowerDefenseWindows
 {
     public class Level
     {
+        // creates the map matrix
         int[,] map = new int[,]
         {
             {0, 0, 1, 0, 0, 0, 0, 0 },
@@ -21,6 +22,28 @@ namespace TowerDefenseWindows
             {0, 0, 1, 0, 0, 0, 0, 0 },
             {0, 0, 1, 1, 1, 1, 1, 1 },
         };
+        // WAYPOINTS FOR PATHWAY
+        private Queue<Vector2> waypoints = new Queue<Vector2>();
+        // param-less constructor for level, values hard coded in FOR NOW.
+        public Level()
+        {
+            waypoints.Enqueue(new Vector2(2, 0) * 32);
+            waypoints.Enqueue(new Vector2(2, 1) * 32);
+            waypoints.Enqueue(new Vector2(3, 1) * 32);
+            waypoints.Enqueue(new Vector2(3, 2) * 32);
+            waypoints.Enqueue(new Vector2(4, 2) * 32);
+            waypoints.Enqueue(new Vector2(4, 4) * 32);
+            waypoints.Enqueue(new Vector2(3, 4) * 32);
+            waypoints.Enqueue(new Vector2(3, 5) * 32);
+            waypoints.Enqueue(new Vector2(2, 5) * 32);
+            waypoints.Enqueue(new Vector2(2, 7) * 32);
+            waypoints.Enqueue(new Vector2(7, 7) * 32);
+        }
+        // get/set for our queue
+        public Queue<Vector2> Waypoints
+        {
+            get { return waypoints; }
+        }
 
         // get/set for width and height of our map
         public int Width
@@ -52,7 +75,7 @@ namespace TowerDefenseWindows
                         continue;
 
                     Texture2D texture = tileTextures[textureIndex];
-                    batch.Draw(texture, new Rectangle(x * 64, y * 64, 64, 64), Color.White);
+                    batch.Draw(texture, new Rectangle(x * 32, y * 32, 32, 32), Color.White);
                 }
             }
         }

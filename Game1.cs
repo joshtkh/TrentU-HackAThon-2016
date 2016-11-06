@@ -1,6 +1,12 @@
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using EnemyCS;
+using AmmoCS;
+using SpritesCS;
+using TowersCS;
 
 namespace TowerDefenseWindows
 {
@@ -13,7 +19,12 @@ namespace TowerDefenseWindows
         SpriteBatch spriteBatch;
 
         // Start here!!!
+        // create the level object
         Level level = new Level();
+        // create an enemy object
+        Enemy enemy1;
+        // tower object next!!
+        Tower tower;
 
         public Game1()
         {
@@ -22,10 +33,12 @@ namespace TowerDefenseWindows
 
             // added content:
             // this sets the background size
-            graphics.PreferredBackBufferWidth = level.Width * 64;   // mul by multiple of 32 to map array space value to screen space
-            graphics.PreferredBackBufferHeight = level.Height * 64;
+            graphics.PreferredBackBufferWidth = level.Width * 32;   // mul by multiple of 32 to map array space value to screen space
+            graphics.PreferredBackBufferHeight = level.Height * 32;
             graphics.ApplyChanges();
             IsMouseVisible = true;
+
+            
         }
 
         /// <summary>
@@ -56,6 +69,13 @@ namespace TowerDefenseWindows
             Texture2D path = Content.Load<Texture2D>("path");
             level.AddTexture(grass); // add grass first!
             level.AddTexture(path);  // add paths afterwards so grass tiles get replaces with paths.
+            // Enemys!!
+            Texture2D enemyTexture = Content.Load<Texture2D>("enemy");
+            enemy1 = new Enemy(enemyTexture, Vector2.Zero, 100, 10, 0.5f);
+            enemy1.SetWaypoints(level.Waypoints);
+            // TOWERS! :D
+            Texture2D towerTexture = Content.Load<Texture2D>("arrowtower");
+            tower = new Tower(towerTexture, Vector2.Zero);
         }
 
         /// <summary>
@@ -78,7 +98,21 @@ namespace TowerDefenseWindows
                 Exit();
 
             // TODO: Add your update logic here
+            // enemies!
+            enemy1.Update(gameTime);
 
+            // tower target updates
+            if (tower.Target == null)
+            {
+                List<Enemy> enemies = new List<Enemy>();
+                enemies.Add(enemy1);
+
+                tower.GetClosestEnemy(enemies);
+            }
+            tower.Update(gameTime);
+            // end of tower target updates
+
+            // ??????
             base.Update(gameTime);
         }
 
@@ -92,7 +126,12 @@ namespace TowerDefenseWindows
 
             // TODO: Add your drawing code here
             spriteBatch.Begin();
+            // draw the level
             level.Draw(spriteBatch);
+            // draw an enemy
+            enemy1.Draw(spriteBatch);
+            // draw a tower
+            //tower.Draw(spriteBatch);
             spriteBatch.End();
 
             // not sure what this is, but it was initiazlied like this so dont touch it.

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace WebApp1
+namespace SpritesCS
 {
-    class Sprites
+    public class Sprites
     {
         protected Texture2D texture;
 
@@ -24,17 +24,18 @@ namespace WebApp1
         {
             get { return center; }
         }
+
         public Sprites(Texture2D tex, Vector2 pos)
         {
-             texture = tex;
+            texture = tex;
 
             position = pos;
             velocity = Vector2.Zero;
 
-            center = new Vector2(position.X + texture.Width /
-                2, position.Y + texture.Height / 2);
+            center = new Vector2(position.X + texture.Width / 2, position.Y + texture.Height / 2);
             origin = new Vector2(texture.Width / 2, texture.Height / 2);
         }
+
         public virtual void Update(GameTime gameTime)
         {
             this.center = new Vector2(position.X + texture.Width / 2,
@@ -44,6 +45,11 @@ namespace WebApp1
         public virtual void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(texture, center, null, Color.White, rotation, origin, 1.0f, SpriteEffects.None, 0);
+        }
+
+        public virtual void Draw(SpriteBatch spriteBatch, Color color)
+        {
+            spriteBatch.Draw(texture, center, null, color, rotation, origin, 1.0f, SpriteEffects.None, 0);
         }
     }
 }

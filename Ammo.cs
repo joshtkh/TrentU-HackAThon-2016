@@ -5,13 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SpritesCS;
 
-namespace WebApp1
+namespace AmmoCS
 {
-    class Ammo : Sprites
+    public class Ammo : Sprites
     {
-         
-
         private int damage;
         private int age;
 
@@ -42,7 +41,6 @@ namespace WebApp1
         public Ammo(Texture2D texture, Vector2 position, Vector2 velocity, int speed, int damage)
             : base(texture, position)
         {
-            this.rotation = rotation;
             this.damage = damage;
 
             this.speed = speed;
