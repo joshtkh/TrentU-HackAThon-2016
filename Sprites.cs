@@ -25,6 +25,11 @@ namespace SpritesCS
             get { return center; }
         }
 
+        public Vector2 Position
+        {
+            get { return position; }
+        }
+
         public Sprites(Texture2D tex, Vector2 pos)
         {
             texture = tex;

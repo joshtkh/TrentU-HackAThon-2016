@@ -7,8 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SpritesCS;
 using EnemyCS;
-using AmmoCS;
-//using Placement;
+using BulletCS;
 
 namespace TowersCS
 {
@@ -21,10 +20,9 @@ namespace TowersCS
 
         protected Enemy target;
 
-        protected float bulletTimer;
+        protected float bulletTimer;    // how long ago the bullet was fired
         protected Texture2D bulletTexture;
-
-        List<Ammo> ammoList = new List<Ammo>();
+        protected List<Bullet> bulletList = new List<Bullet>();
 
         // get/set for class values
         public int Cost
@@ -77,10 +75,7 @@ namespace TowersCS
 
         public bool IsInRange(Vector2 position)
         {
-            if (Vector2.Distance(center, position) <= radius)
-                return true;
-            // else
-            return false;
+            return Vector2.Distance(center, position) <= radius;
         }
 
         public virtual void GetClosestEnemy(List<Enemy> enemies)
@@ -102,28 +97,29 @@ namespace TowersCS
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-
-            //bulletTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            // updates bullet timer (0 when fired)
+            bulletTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (target != null)
             {
                 // makes sure we always face the target
                 FaceTarget();
 
-                //if (!IsInRange(target.Center) || target.IsDead)
-                //{
-                //    target = null;
-                //    bulletTimer = 0;
-                //}
+                if (!IsInRange(target.Center) || target.IsDead)
+                {
+                    target = null;
+                    bulletTimer = 0;
+                }
             }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            base.Draw(spriteBatch);
+            // loop through all bullets and draw them
+            foreach (Bullet bullet in bulletList)
+                bullet.Draw(spriteBatch);
 
-            foreach (Ammo ammo in ammoList)
-                ammo.Draw(spriteBatch);
+            base.Draw(spriteBatch);
         }
     }
 }

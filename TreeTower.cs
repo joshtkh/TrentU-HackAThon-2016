@@ -3,61 +3,61 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using TowersCS;
+using BulletCS;
 
-namespace TreeTower
+namespace TreeTowerCS
 {
-    class TreeTower
+    public class TreeTower : Tower
     {
-        public class TreeTower : Tower
+        // constructor
+        public TreeTower(Texture2D texture, Texture2D bulletTexture, Vector2 position)
+            : base(texture, bulletTexture, position)
         {
-            public TreeTower(Texture2D texture, Texture2D ammoTexture, Vector2 position)
-                : base(texture, ammoTexture, position)
-            {//damage and stuff for trees
-                this.damage = 15;
+            //damage and stuff for trees
+            this.damage = 15;
+            this.cost = 15;
+            this.radius = 100;
+        }
 
-                this.cost = 15;
+        public override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
 
-                this.radius = 100;
+            // bends bullets towards target
+            if (bulletTimer >= 0.75f && target != null)
+            {
+                Bullet bullet = new Bullet(bulletTexture, Vector2.Subtract(center, new Vector2(bulletTexture.Width / 2)), rotation, 6, damage);
+
+                bulletList.Add(bullet);
+                bulletTimer = 0;
             }
 
-            public override void Update(GameTime gameTime)
+            // loops through our bullet list to update it
+            for (int i = 0; i < bulletList.Count; i++)
             {
-                base.Update(gameTime);
+                Bullet bullet = bulletList[i];
 
-                if (bulletTimer >= 0.75f && target != null)
+                bullet.SetRotation(rotation);
+                bullet.Update(gameTime);
+
+                if (!IsInRange(bullet.Center))
+                    bullet.Kill();
+
+                if (target != null && Vector2.Distance(bullet.Center, target.Center) < 12) // 12 = (width of bullet / 2) + (width of enemy / 2)
                 {
-                    Ammo ammo = new Ammo(ammoTexture, Vector2.Subtract(center,
-                        new Vector2(ammoTexture.Width / 2)), rotation, 6, damage);
-
-                    ammoList.Add(ammo);
-                    bulletTimer = 0;
+                    target.CurrentHealth -= bullet.Damage;
+                    bullet.Kill();
                 }
 
-                for (int i = 0; i < ammoList.Count; i++)
+                if (bullet.IsDead())
                 {
-                    Ammo ammo = ammotList[i];
-
-                    ammo.SetRotation(rotation);
-                    ammo.Update(gameTime);
-
-                    if (!IsInRange(ammo.Center))
-                        ammo.Kill();
-
-                    if (target != null && Vector2.Distance(ammo.Center, target.Center) < 15)
-                    {
-                        target.CurrentHealth -= ammo.Damage;
-                        ammo.Kill();
-                    }
-
-                    if (ammo.IsDead())
-                    {
-                        ammoList.Remove(ammo);
-                        i--;
-                    }
+                    bulletList.Remove(bullet);
+                    i--;
                 }
             }
         }
-    
-
-
-
+    }
+}

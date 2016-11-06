@@ -18,7 +18,7 @@ namespace EnemyCS
         protected bool alive = true;
 
         protected float speed = 0.5f;
-        protected int bountyGiven;
+        protected int bountyGiven = 0;
 
         public float CurrentHealth
         {
@@ -28,7 +28,7 @@ namespace EnemyCS
 
         public bool IsDead
         {
-            get { return currentHealth <= 0; }
+            get { return !alive; }
         }
 
         public int BountyGiven

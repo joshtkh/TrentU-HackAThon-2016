@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace TowerDefenseWindows
+namespace LevelCS
 {
     public class Level
     {
@@ -61,6 +61,16 @@ namespace TowerDefenseWindows
         public void AddTexture(Texture2D texture)
         {
             tileTextures.Add(texture);
+        }
+
+        // returns the index of the requested cell
+        public int GetIndex(int cellX, int cellY)
+        {
+            // It needs to be Width - 1 and Height - 1.
+            if (cellX < 0 || cellX > Width - 1 || cellY < 0 || cellY > Height - 1)
+                return 0;
+
+            return map[cellY, cellX];
         }
 
         // Draw method

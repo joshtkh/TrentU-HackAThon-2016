@@ -4,9 +4,15 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using EnemyCS;
-using AmmoCS;
+using BulletCS;
 using SpritesCS;
 using TowersCS;
+using LevelCS;
+using PlayerCS;
+using WaveCS;
+using WaveManagerCS;
+using MenuBarCS;
+using ButtonCS;
 
 namespace TowerDefenseWindows
 {
@@ -21,10 +27,14 @@ namespace TowerDefenseWindows
         // Start here!!!
         // create the level object
         Level level = new Level();
-        // create an enemy object
-        Enemy enemy1;
-        // tower object next!!
-        Tower tower;
+        // create a wave object
+        WaveManager waveManager;
+        // create a player object
+        Player player;
+        // create a toolbar
+        Toolbar toolbar;
+        // create a button
+        Button treeButton;
 
         public Game1()
         {
@@ -34,11 +44,10 @@ namespace TowerDefenseWindows
             // added content:
             // this sets the background size
             graphics.PreferredBackBufferWidth = level.Width * 32;   // mul by multiple of 32 to map array space value to screen space
-            graphics.PreferredBackBufferHeight = level.Height * 32;
+            graphics.PreferredBackBufferHeight = 32 + level.Height * 32;
             graphics.ApplyChanges();
             IsMouseVisible = true;
 
-            
         }
 
         /// <summary>
@@ -64,18 +73,39 @@ namespace TowerDefenseWindows
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            // Added content:
+            // Textures:
             Texture2D grass = Content.Load<Texture2D>("grass");
             Texture2D path = Content.Load<Texture2D>("path");
+            Texture2D towerTexture = Content.Load<Texture2D>("arrowtower");
+            Texture2D bulletTexture = Content.Load<Texture2D>("bullet");
+            Texture2D enemyTexture = Content.Load<Texture2D>("enemy");
+            Texture2D topBar = Content.Load<Texture2D>("toolbar");
+            SpriteFont font = Content.Load<SpriteFont>("Arial");
+            // The "Normal" texture for the tower button.
+            Texture2D btnNormal = Content.Load<Texture2D>("GUI\\arrow-button");
+            // The "MouseOver" texture for the tower button.
+            Texture2D btnHover = Content.Load<Texture2D>("GUI\\arrow-hover");
+            // The "Pressed" texture for the tower button.
+            Texture2D btnPressed = Content.Load<Texture2D>("GUI\\arrow-pressed");
+
             level.AddTexture(grass); // add grass first!
             level.AddTexture(path);  // add paths afterwards so grass tiles get replaces with paths.
-            // Enemys!!
-            Texture2D enemyTexture = Content.Load<Texture2D>("enemy");
-            enemy1 = new Enemy(enemyTexture, Vector2.Zero, 100, 10, 0.5f);
-            enemy1.SetWaypoints(level.Waypoints);
-            // TOWERS! :D
-            Texture2D towerTexture = Content.Load<Texture2D>("arrowtower");
-            tower = new Tower(towerTexture, Vector2.Zero);
+
+            // players!
+            player = new Player(level, towerTexture, bulletTexture);
+            // Initializing the waves!
+            waveManager = new WaveManager(player, level, 24, enemyTexture);
+            // toolbar
+            toolbar = new Toolbar(topBar, font, new Vector2(0, level.Height * 32));
+            // Initialize the button.
+            treeButton = new Button(btnNormal, btnHover, btnPressed, new Vector2(0, level.Height * 32));
+            // create an event for button click
+            treeButton.Clicked += new EventHandler(treeButton_Clicked);
+        }
+        // 
+        private void treeButton_Clicked(object sender, EventArgs e)
+        {
+            player.NewTowerType = "Arrow Tower";
         }
 
         /// <summary>
@@ -98,19 +128,11 @@ namespace TowerDefenseWindows
                 Exit();
 
             // TODO: Add your update logic here
-            // enemies!
-            enemy1.Update(gameTime);
-
-            // tower target updates
-            if (tower.Target == null)
-            {
-                List<Enemy> enemies = new List<Enemy>();
-                enemies.Add(enemy1);
-
-                tower.GetClosestEnemy(enemies);
-            }
-            tower.Update(gameTime);
-            // end of tower target updates
+            // wave of enemies!
+            waveManager.Update(gameTime);
+            player.Update(gameTime, waveManager.Enemies);
+            //Update the arrow button.
+            treeButton.Update(gameTime);
 
             // ??????
             base.Update(gameTime);
@@ -125,13 +147,20 @@ namespace TowerDefenseWindows
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
+            // start
             spriteBatch.Begin();
+
             // draw the level
             level.Draw(spriteBatch);
             // draw an enemy
-            enemy1.Draw(spriteBatch);
+            waveManager.Draw(spriteBatch);
             // draw a tower
-            //tower.Draw(spriteBatch);
+            player.Draw(spriteBatch);
+            // draw the toolbar
+            toolbar.Draw(spriteBatch, player);
+            // and then our buttons.
+            treeButton.Draw(spriteBatch);
+            // end
             spriteBatch.End();
 
             // not sure what this is, but it was initiazlied like this so dont touch it.
